@@ -1,0 +1,14 @@
+# Stage 1: build
+FROM maven:3.10.1-eclipse-temurin-17 AS build
+WORKDIR /workspace
+COPY pom.xml ./
+COPY src ./src
+RUN mvn -B clean package -DskipTests
+
+# Stage 2: run
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /workspace/target/localbuy-backend-1.0.0.jar ./localbuy-backend.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/localbuy-backend.jar"]
